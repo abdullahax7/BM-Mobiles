@@ -239,3 +239,4 @@ For production, consider PostgreSQL:
 - Application logs in console during development
 - Elasticsearch logs: `npm run docker:logs elasticsearch`
 - Database queries visible with Prisma debug mode
+# 233
