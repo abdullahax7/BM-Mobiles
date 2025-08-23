@@ -16,9 +16,10 @@ const UpdatePartSchema = z.object({
 type PartUpdateData = Partial<{ name: string; description?: string; sku: string; realCost: number; sellingPrice: number; stock: number; lowStockThreshold: number }>
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  request: Request,
+  context: any
 ) {
+  const { params } = context as { params: { id: string } }
   try {
     const part = await db.part.findUnique({
       where: { id: params.id },
@@ -70,9 +71,10 @@ export async function GET(
 }
 
 export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  request: Request,
+  context: any
 ) {
+  const { params } = context as { params: { id: string } }
   try {
     const body = await request.json()
     const data = UpdatePartSchema.parse(body)
@@ -165,9 +167,10 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  request: Request,
+  context: any
 ) {
+  const { params } = context as { params: { id: string } }
   try {
     // Check if part exists
     const existingPart = await db.part.findUnique({
