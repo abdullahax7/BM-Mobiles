@@ -71,8 +71,9 @@ export async function POST(request: NextRequest) {
     console.error('Error creating brand:', error)
     
     if (error instanceof z.ZodError) {
+      const details = (error as any).errors ?? (error as any).issues ?? []
       return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
+        { error: 'Validation failed', details },
         { status: 400 }
       )
     }
@@ -101,8 +102,9 @@ export async function PUT(request: NextRequest) {
   } catch (error) {
     console.error('Error updating brand:', error)
     if (error instanceof z.ZodError) {
+      const details = (error as any).errors ?? (error as any).issues ?? []
       return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
+        { error: 'Validation failed', details },
         { status: 400 }
       )
     }
