@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     console.error('Error creating model:', error)
     
     if (error instanceof z.ZodError) {
-      const details = (error as any).errors ?? (error as any).issues ?? []
+      const details = error.issues
       return NextResponse.json(
         { error: 'Validation failed', details },
         { status: 400 }
@@ -80,7 +80,7 @@ export async function PUT(request: NextRequest) {
   } catch (error) {
     console.error('Error updating model:', error)
     if (error instanceof z.ZodError) {
-      const details = (error as any).errors ?? (error as any).issues ?? []
+      const details = error.issues
       return NextResponse.json(
         { error: 'Validation failed', details },
         { status: 400 }

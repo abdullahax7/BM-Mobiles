@@ -171,7 +171,7 @@ export async function POST(request: NextRequest) {
     console.error('Error creating part:', error)
     
     if (error instanceof z.ZodError) {
-      const details = (error as any).errors ?? (error as any).issues ?? []
+      const details = error.issues
       return NextResponse.json(
         { error: 'Validation failed', details },
         { status: 400 }
