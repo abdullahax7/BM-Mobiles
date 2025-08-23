@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Platform {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  brands Brand[]
+}
+
+model Brand {
+  id         String   @id @default(cuid())
+  name       String
+  slug       String
+  platformId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  platform Platform @relation(fields: [platformId], references: [id], onDelete: Cascade)
+  families Family[]
+
+  @@unique([platformId, slug])
+}
+
+model Family {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String
+  brandId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  brand  Brand   @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  models Model[]
+
+  @@unique([brandId, slug])
+}
+
+model Model {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String
+  familyId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  parts  PartModel[]
+
+  @@unique([familyId, slug])
+}
+
+model Part {
+  id                String   @id @default(cuid())
+  name              String
+  description       String?
+  sku               String   @unique
+  realCost          Float
+  sellingPrice      Float
+  stock             Int      @default(0)
+  lowStockThreshold Int      @default(10)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  models       PartModel[]
+  transactions Transaction[]
+}
+
+model PartModel {
+  partId  String
+  modelId String
+
+  part  Part  @relation(fields: [partId], references: [id], onDelete: Cascade)
+  model Model @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+  @@id([partId, modelId])
+}
+
+enum TransactionType {
+  IN
+  OUT
+  ADJUST
+}
+
+model Transaction {
+  id          String          @id @default(cuid())
+  type        TransactionType
+  quantity    Int
+  reason      String?
+  partId      String
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  part Part @relation(fields: [partId], references: [id], onDelete: Cascade)
+}
+
+model Shortcut {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  filters     String   // JSON string of filter object
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

@@ -1,0 +1,244 @@
+import { db } from '@/lib/db'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Edit, Trash2 } from 'lucide-react'
+import Link from 'next/link'
+
+interface PartsTableProps {
+  searchParams: {
+    q?: string
+    page?: string
+    platform?: string
+    brand?: string
+    family?: string
+    model?: string
+    lowStock?: string
+    minPrice?: string
+    maxPrice?: string
+  }
+}
+
+export async function PartsTable({ searchParams }: PartsTableProps) {
+  const page = parseInt(searchParams.page || '1')
+  const limit = 20
+  const offset = (page - 1) * limit
+
+  // Build where clause
+  const where: Record<string, unknown> = {}
+  
+  if (searchParams.q) {
+    where.OR = [
+      { name: { contains: searchParams.q } },
+      { description: { contains: searchParams.q } },
+      { sku: { contains: searchParams.q } }
+    ]
+  }
+
+  // Note: Low stock filter will be handled post-query due to SQLite limitations
+
+  if (searchParams.minPrice || searchParams.maxPrice) {
+    const priceFilter: { gte?: number; lte?: number } = {}
+    if (searchParams.minPrice) {
+      priceFilter.gte = parseFloat(searchParams.minPrice)
+    }
+    if (searchParams.maxPrice) {
+      priceFilter.lte = parseFloat(searchParams.maxPrice)
+    }
+    ;(where as Record<string, unknown>).sellingPrice = priceFilter
+  }
+
+  // Add model filters through relations
+  if (searchParams.platform || searchParams.brand || searchParams.family || searchParams.model) {
+    where.models = {
+      some: {
+        model: {
+          ...(searchParams.model && { slug: searchParams.model }),
+          family: {
+            ...(searchParams.family && { slug: searchParams.family }),
+            brand: {
+              ...(searchParams.brand && { slug: searchParams.brand }),
+              platform: {
+                ...(searchParams.platform && { slug: searchParams.platform })
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  const [initialParts, totalCount] = await Promise.all([
+    db.part.findMany({
+      where,
+      skip: offset,
+      take: limit,
+      orderBy: { updatedAt: 'desc' },
+      include: {
+        models: {
+          include: {
+            model: {
+              include: {
+                family: {
+                  include: {
+                    brand: {
+                      include: {
+                        platform: true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        _count: {
+          select: {
+            transactions: true
+          }
+        }
+      }
+    }),
+    db.part.count({ where })
+  ])
+
+  let parts = initialParts
+
+  // Apply low stock filter if needed
+  if (searchParams.lowStock === 'true') {
+    parts = parts.filter(part => part.stock <= part.lowStockThreshold)
+  }
+
+  const totalPages = Math.ceil(totalCount / limit)
+
+  return (
+    <div className="space-y-4">
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>SKU</TableHead>
+              <TableHead>Stock</TableHead>
+              <TableHead>Cost</TableHead>
+              <TableHead>Price</TableHead>
+              <TableHead>Compatible Models</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="w-[100px]">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {parts.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} className="h-24 text-center">
+                  No parts found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              parts.map((part) => {
+                const isLowStock = part.stock <= part.lowStockThreshold
+                const isOutOfStock = part.stock === 0
+                
+                return (
+                  <TableRow key={part.id}>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{part.name}</div>
+                        {part.description && (
+                          <div className="text-sm text-muted-foreground">
+                            {part.description}
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-mono">{part.sku}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        {part.stock}
+                        <span className="text-muted-foreground text-sm">
+                          /{part.lowStockThreshold}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>${part.realCost.toFixed(2)}</TableCell>
+                    <TableCell>${part.sellingPrice.toFixed(2)}</TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {part.models.slice(0, 3).map((partModel) => (
+                          <Badge key={partModel.modelId} variant="secondary" className="text-xs">
+                            {partModel.model.name}
+                          </Badge>
+                        ))}
+                        {part.models.length > 3 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{part.models.length - 3} more
+                          </Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          isOutOfStock
+                            ? "destructive"
+                            : isLowStock
+                            ? "secondary"
+                            : "default"
+                        }
+                      >
+                        {isOutOfStock
+                          ? "Out of Stock"
+                          : isLowStock
+                          ? "Low Stock"
+                          : "In Stock"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Link href={`/parts/${part.id}`}>
+                          <Button variant="ghost" size="sm">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </Link>
+                        <Button variant="ghost" size="sm">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )
+              })
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-muted-foreground">
+            Showing {offset + 1} to {Math.min(offset + limit, totalCount)} of {totalCount} parts
+          </div>
+          <div className="flex items-center gap-2">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+              <Link key={pageNum} href={`/parts?page=${pageNum}`}>
+                <Button
+                  variant={page === pageNum ? "default" : "outline"}
+                  size="sm"
+                >
+                  {pageNum}
+                </Button>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
