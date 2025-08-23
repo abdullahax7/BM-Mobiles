@@ -2,7 +2,7 @@ import { Suspense } from 'react'
 import { SearchInterface } from '@/components/search/search-interface'
 
 interface PageProps {
-  searchParams: {
+  searchParams: Promise<{
     q?: string
     platform?: string
     brand?: string
@@ -12,7 +12,7 @@ interface PageProps {
     minPrice?: string
     maxPrice?: string
     page?: string
-  }
+  }>
 }
 
 export default function SearchPage({ searchParams }: PageProps) {

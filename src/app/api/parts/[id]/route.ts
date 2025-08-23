@@ -17,12 +17,13 @@ type PartUpdateData = Partial<{ name: string; description?: string; sku: string;
 
 export async function GET(
   request: Request,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   const { params } = context
+  const resolvedParams = await params
   try {
     const part = await db.part.findUnique({
-      where: { id: params.id },
+      where: { id: resolvedParams.id },
       include: {
         models: {
           include: {
@@ -72,16 +73,17 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   const { params } = context
+  const resolvedParams = await params
   try {
     const body = await request.json()
     const data = UpdatePartSchema.parse(body)
 
     // Check if part exists
     const existingPart = await db.part.findUnique({
-      where: { id: params.id }
+      where: { id: resolvedParams.id }
     })
 
     if (!existingPart) {
@@ -102,7 +104,7 @@ export async function PUT(
     if (data.lowStockThreshold !== undefined) updateData.lowStockThreshold = data.lowStockThreshold
 
     await db.part.update({
-      where: { id: params.id },
+      where: { id: resolvedParams.id },
       data: updateData
     })
 
@@ -110,14 +112,14 @@ export async function PUT(
     if (data.modelIds !== undefined) {
       // Delete existing relationships
       await db.partModel.deleteMany({
-        where: { partId: params.id }
+        where: { partId: resolvedParams.id }
       })
 
       // Create new relationships
       if (data.modelIds.length > 0) {
         await db.partModel.createMany({
           data: data.modelIds.map(modelId => ({
-            partId: params.id,
+            partId: resolvedParams.id,
             modelId
           }))
         })
@@ -126,7 +128,7 @@ export async function PUT(
 
     // Fetch the updated part with relationships
     const updatedPart = await db.part.findUnique({
-      where: { id: params.id },
+      where: { id: resolvedParams.id },
       include: {
         models: {
           include: {
@@ -168,13 +170,14 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   const { params } = context
+  const resolvedParams = await params
   try {
     // Check if part exists
     const existingPart = await db.part.findUnique({
-      where: { id: params.id }
+      where: { id: resolvedParams.id }
     })
 
     if (!existingPart) {
@@ -186,7 +189,7 @@ export async function DELETE(
 
     // Delete the part (relationships will be deleted due to cascade)
     await db.part.delete({
-      where: { id: params.id }
+      where: { id: resolvedParams.id }
     })
 
     return NextResponse.json({ message: 'Part deleted successfully' })

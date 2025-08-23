@@ -27,46 +27,47 @@ interface PartsTableProps {
 }
 
 export async function PartsTable({ searchParams }: PartsTableProps) {
-  const page = parseInt(searchParams.page || '1')
+  const resolvedSearchParams = await searchParams
+  const page = parseInt(resolvedSearchParams.page || '1')
   const limit = 20
   const offset = (page - 1) * limit
 
   // Build where clause
   const where: Record<string, unknown> = {}
   
-  if (searchParams.q) {
+  if (resolvedSearchParams.q) {
     where.OR = [
-      { name: { contains: searchParams.q } },
-      { description: { contains: searchParams.q } },
-      { sku: { contains: searchParams.q } }
+      { name: { contains: resolvedSearchParams.q } },
+      { description: { contains: resolvedSearchParams.q } },
+      { sku: { contains: resolvedSearchParams.q } }
     ]
   }
 
   // Note: Low stock filter will be handled post-query due to SQLite limitations
 
-  if (searchParams.minPrice || searchParams.maxPrice) {
+  if (resolvedSearchParams.minPrice || resolvedSearchParams.maxPrice) {
     const priceFilter: { gte?: number; lte?: number } = {}
-    if (searchParams.minPrice) {
-      priceFilter.gte = parseFloat(searchParams.minPrice)
+    if (resolvedSearchParams.minPrice) {
+      priceFilter.gte = parseFloat(resolvedSearchParams.minPrice)
     }
-    if (searchParams.maxPrice) {
-      priceFilter.lte = parseFloat(searchParams.maxPrice)
+    if (resolvedSearchParams.maxPrice) {
+      priceFilter.lte = parseFloat(resolvedSearchParams.maxPrice)
     }
     ;(where as Record<string, unknown>).sellingPrice = priceFilter
   }
 
   // Add model filters through relations
-  if (searchParams.platform || searchParams.brand || searchParams.family || searchParams.model) {
+  if (resolvedSearchParams.platform || resolvedSearchParams.brand || resolvedSearchParams.family || resolvedSearchParams.model) {
     where.models = {
       some: {
         model: {
-          ...(searchParams.model && { slug: searchParams.model }),
+          ...(resolvedSearchParams.model && { slug: resolvedSearchParams.model }),
           family: {
-            ...(searchParams.family && { slug: searchParams.family }),
+            ...(resolvedSearchParams.family && { slug: resolvedSearchParams.family }),
             brand: {
-              ...(searchParams.brand && { slug: searchParams.brand }),
+              ...(resolvedSearchParams.brand && { slug: resolvedSearchParams.brand }),
               platform: {
-                ...(searchParams.platform && { slug: searchParams.platform })
+                ...(resolvedSearchParams.platform && { slug: resolvedSearchParams.platform })
               }
             }
           }
@@ -112,7 +113,7 @@ export async function PartsTable({ searchParams }: PartsTableProps) {
   let parts = initialParts
 
   // Apply low stock filter if needed
-  if (searchParams.lowStock === 'true') {
+  if (resolvedSearchParams.lowStock === 'true') {
     parts = parts.filter(part => part.stock <= part.lowStockThreshold)
   }
 

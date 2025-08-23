@@ -6,11 +6,11 @@ import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 
 interface PageProps {
-  searchParams: {
+  searchParams: Promise<{
     page?: string
     partId?: string
     type?: string
-  }
+  }>
 }
 
 export default async function TransactionsPage({ searchParams }: PageProps) {

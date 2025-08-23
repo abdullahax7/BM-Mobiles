@@ -6,7 +6,7 @@ import { Plus } from 'lucide-react'
 import Link from 'next/link'
 
 interface PageProps {
-  searchParams: {
+  searchParams: Promise<{
     q?: string
     page?: string
     platform?: string
@@ -16,7 +16,7 @@ interface PageProps {
     lowStock?: string
     minPrice?: string
     maxPrice?: string
-  }
+  }>
 }
 
 export default function PartsPage({ searchParams }: PageProps) {

@@ -3,15 +3,16 @@ import { PartForm } from '@/components/parts/part-form'
 import { db } from '@/lib/db'
 
 interface PartPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default async function PartPage({ params }: PartPageProps) {
+  const resolvedParams = await params
   const [part, models] = await Promise.all([
     db.part.findUnique({
-      where: { id: params.id },
+      where: { id: resolvedParams.id },
       include: {
         models: {
           include: {

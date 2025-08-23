@@ -463,7 +463,7 @@ function NewItemDialog({ isOpen, onClose, type, parentId, platforms, onItemCreat
                   {type === 'family' && platforms.flatMap(platform => 
                     platform.brands.map(brand => (
                       <SelectItem key={brand.id} value={brand.id}>
-                        {platform.name} {'>'} {brand.name}
+                        {platform.name} {' > '} {brand.name}
                       </SelectItem>
                     ))
                   )}
@@ -471,7 +471,7 @@ function NewItemDialog({ isOpen, onClose, type, parentId, platforms, onItemCreat
                     platform.brands.flatMap(brand =>
                       brand.families.map(family => (
                         <SelectItem key={family.id} value={family.id}>
-                          {platform.name} {'>'} {brand.name} {'>'} {family.name}
+                          {platform.name} {' > '} {brand.name} {' > '} {family.name}
                         </SelectItem>
                       ))
                     )

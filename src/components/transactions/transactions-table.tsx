@@ -21,14 +21,15 @@ interface TransactionsTableProps {
 }
 
 export async function TransactionsTable({ searchParams }: TransactionsTableProps) {
-  const page = parseInt(searchParams.page || '1')
+  const resolvedSearchParams = await searchParams
+  const page = parseInt(resolvedSearchParams.page || '1')
   const limit = 20
   const offset = (page - 1) * limit
 
   // Build where clause
   const where: Record<string, unknown> = {}
-  if (searchParams.partId) where.partId = searchParams.partId
-  if (searchParams.type) where.type = searchParams.type
+  if (resolvedSearchParams.partId) where.partId = resolvedSearchParams.partId
+  if (resolvedSearchParams.type) where.type = resolvedSearchParams.type
 
   const [transactions, totalCount] = await Promise.all([
     db.transaction.findMany({
