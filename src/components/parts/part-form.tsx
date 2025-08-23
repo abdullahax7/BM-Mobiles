@@ -11,7 +11,6 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Badge } from '@/components/ui/badge'
 import { Loader2, Save, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
@@ -102,7 +101,7 @@ export function PartForm({ part, models }: PartFormProps) {
         throw new Error(error.message || 'Failed to save part')
       }
 
-      const savedPart = await response.json()
+      await response.json()
       router.push('/parts')
       router.refresh()
     } catch (error) {

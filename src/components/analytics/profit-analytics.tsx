@@ -2,25 +2,13 @@ import { db } from '@/lib/db'
 
 export async function ProfitAnalytics() {
   const [
-    parts,
-    totalCost,
-    totalValue
+    parts
   ] = await Promise.all([
     db.part.findMany({
       select: {
         realCost: true,
         sellingPrice: true,
         stock: true
-      }
-    }),
-    db.part.aggregate({
-      _sum: {
-        realCost: true
-      }
-    }),
-    db.part.aggregate({
-      _sum: {
-        sellingPrice: true
       }
     })
   ])

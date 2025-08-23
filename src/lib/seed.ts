@@ -37,13 +37,6 @@ async function main() {
     }
   })
 
-  const lgBrand = await prisma.brand.create({
-    data: {
-      name: 'LG',
-      slug: generateSlug('LG'),
-      platformId: androidPlatform.id,
-    }
-  })
 
   // Create brands for iOS
   const appleBrand = await prisma.brand.create({
@@ -63,13 +56,6 @@ async function main() {
     }
   })
 
-  const galaxyNoteFamily = await prisma.family.create({
-    data: {
-      name: 'Galaxy Note',
-      slug: generateSlug('Galaxy Note'),
-      brandId: samsungBrand.id,
-    }
-  })
 
   // Create families for Apple
   const iphoneFamily = await prisma.family.create({

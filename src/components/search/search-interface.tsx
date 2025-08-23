@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Search, Filter, Zap } from 'lucide-react'
+import { Search, Zap } from 'lucide-react'
 import Link from 'next/link'
 
 interface SearchResult {

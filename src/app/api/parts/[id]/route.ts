@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
 
@@ -17,9 +17,9 @@ type PartUpdateData = Partial<{ name: string; description?: string; sku: string;
 
 export async function GET(
   request: Request,
-  context: any
+  context: { params: { id: string } }
 ) {
-  const { params } = context as { params: { id: string } }
+  const { params } = context
   try {
     const part = await db.part.findUnique({
       where: { id: params.id },
@@ -72,9 +72,9 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  context: any
+  context: { params: { id: string } }
 ) {
-  const { params } = context as { params: { id: string } }
+  const { params } = context
   try {
     const body = await request.json()
     const data = UpdatePartSchema.parse(body)
@@ -168,9 +168,9 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  context: any
+  context: { params: { id: string } }
 ) {
-  const { params } = context as { params: { id: string } }
+  const { params } = context
   try {
     // Check if part exists
     const existingPart = await db.part.findUnique({

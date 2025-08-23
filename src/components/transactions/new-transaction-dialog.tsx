@@ -18,7 +18,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Loader2, Plus } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 
 const TransactionFormSchema = z.object({
   type: z.enum(['IN', 'OUT', 'ADJUST']),
