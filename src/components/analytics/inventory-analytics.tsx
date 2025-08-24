@@ -48,7 +48,7 @@ export async function InventoryAnalytics() {
           <p className="text-xs text-muted-foreground">Total Parts</p>
         </div>
         <div className="space-y-1">
-          <p className="text-2xl font-bold">${(totalValue._sum.sellingPrice || 0).toFixed(0)}</p>
+          <p className="text-2xl font-bold">PKR {(totalValue._sum.sellingPrice || 0).toFixed(0)}</p>
           <p className="text-xs text-muted-foreground">Total Value</p>
         </div>
         <div className="space-y-1">

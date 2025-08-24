@@ -41,7 +41,7 @@ export async function DashboardStats() {
     },
     {
       title: 'Inventory Value',
-      value: `$${(totalValue._sum.sellingPrice || 0).toFixed(2)}`,
+      value: `PKR ${(totalValue._sum.sellingPrice || 0).toFixed(2)}`,
       icon: DollarSign,
       description: 'Total estimated value'
     },

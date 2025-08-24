@@ -9,8 +9,9 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Edit, Trash2 } from 'lucide-react'
+import { Edit } from 'lucide-react'
 import Link from 'next/link'
+import { DeletePartButton } from '@/components/parts/delete-part-button'
 
 interface PartsTableProps {
   searchParams: {
@@ -168,8 +169,8 @@ export async function PartsTable({ searchParams }: PartsTableProps) {
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell>${part.realCost.toFixed(2)}</TableCell>
-                    <TableCell>${part.sellingPrice.toFixed(2)}</TableCell>
+                    <TableCell>PKR {part.realCost.toFixed(2)}</TableCell>
+                    <TableCell>PKR {part.sellingPrice.toFixed(2)}</TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
                         {part.models.slice(0, 3).map((partModel) => (
@@ -208,9 +209,7 @@ export async function PartsTable({ searchParams }: PartsTableProps) {
                             <Edit className="h-4 w-4" />
                           </Button>
                         </Link>
-                        <Button variant="ghost" size="sm">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <DeletePartButton id={part.id} />
                       </div>
                     </TableCell>
                   </TableRow>

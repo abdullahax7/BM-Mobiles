@@ -31,7 +31,7 @@ export async function ProfitAnalytics() {
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-4">
         <div className="space-y-1">
-          <p className="text-2xl font-bold text-green-600">${potentialProfit.toFixed(0)}</p>
+          <p className="text-2xl font-bold text-green-600">PKR {potentialProfit.toFixed(0)}</p>
           <p className="text-xs text-muted-foreground">Potential Profit</p>
         </div>
         <div className="space-y-1">
@@ -45,11 +45,11 @@ export async function ProfitAnalytics() {
         <div className="space-y-1">
           <div className="flex justify-between text-sm">
             <span>Invested Cost</span>
-            <span className="text-red-600">${totalInvestedCost.toFixed(0)}</span>
+            <span className="text-red-600">PKR {totalInvestedCost.toFixed(0)}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span>Potential Revenue</span>
-            <span className="text-green-600">${totalPotentialRevenue.toFixed(0)}</span>
+            <span className="text-green-600">PKR {totalPotentialRevenue.toFixed(0)}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span>Avg Markup</span>

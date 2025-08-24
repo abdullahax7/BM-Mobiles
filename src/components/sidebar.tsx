@@ -7,10 +7,9 @@ import {
   LayoutDashboard,
   Package,
   Layers,
-  ArrowUpDown,
   BarChart3,
-  Settings,
-  Search
+  ShoppingCart,
+  ExternalLink
 } from 'lucide-react'
 
 const navigation = [
@@ -18,6 +17,11 @@ const navigation = [
     name: 'Dashboard',
     href: '/',
     icon: LayoutDashboard,
+  },
+  {
+    name: 'Sales',
+    href: '/sales',
+    icon: ShoppingCart,
   },
   {
     name: 'Parts',
@@ -30,24 +34,9 @@ const navigation = [
     icon: Layers,
   },
   {
-    name: 'Transactions',
-    href: '/transactions',
-    icon: ArrowUpDown,
-  },
-  {
     name: 'Analytics',
     href: '/analytics',
     icon: BarChart3,
-  },
-  {
-    name: 'Search',
-    href: '/search',
-    icon: Search,
-  },
-  {
-    name: 'Settings',
-    href: '/settings',
-    icon: Settings,
   },
 ]
 
@@ -55,14 +44,14 @@ export function Sidebar() {
   const pathname = usePathname()
 
   return (
-    <div className="w-64 bg-card border-r border-border">
+    <div className="w-64 bg-card border-r border-border flex flex-col h-screen">
       <div className="p-6">
         <h1 className="text-2xl font-bold text-foreground">
-          Mobile Repair Shop
+         BM Mobile Phone & Repairing Center 
         </h1>
       </div>
       
-      <nav className="px-4 space-y-2">
+      <nav className="px-4 space-y-2 flex-1">
         {navigation.map((item) => {
           const isActive = pathname === item.href || 
             (item.href !== '/' && pathname.startsWith(item.href))
@@ -84,6 +73,18 @@ export function Sidebar() {
           )
         })}
       </nav>
+      
+      <div className="p-4 border-t border-border">
+        <a 
+          href="https://abdullahax.com" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="flex items-center justify-center text-xs text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Made by Abdullahax.com
+          <ExternalLink className="ml-1 h-3 w-3" />
+        </a>
+      </div>
     </div>
   )
 }

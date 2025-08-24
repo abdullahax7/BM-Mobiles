@@ -73,6 +73,7 @@ model Part {
 
   models       PartModel[]
   transactions Transaction[]
+  saleItems    SaleItem[]
 }
 
 model PartModel {
@@ -89,6 +90,56 @@ enum TransactionType {
   IN
   OUT
   ADJUST
+  SALE
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  ONLINE
+  OTHER
+}
+
+enum SaleStatus {
+  COMPLETED
+  CANCELLED
+  REFUNDED
+  PENDING
+}
+
+model Sale {
+  id              String        @id @default(cuid())
+  customerName    String?
+  customerPhone   String?
+  customerEmail   String?
+  totalAmount     Float
+  discount        Float         @default(0)
+  finalAmount     Float
+  paymentMethod   PaymentMethod
+  status          SaleStatus    @default(COMPLETED)
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  items        SaleItem[]
+  transactions Transaction[]
+}
+
+model SaleItem {
+  id         String   @id @default(cuid())
+  saleId     String
+  partId     String
+  quantity   Int
+  unitPrice  Float
+  totalPrice Float
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  sale Sale @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  part Part @relation(fields: [partId], references: [id])
+
+  @@index([saleId])
+  @@index([partId])
 }
 
 model Transaction {
@@ -97,10 +148,12 @@ model Transaction {
   quantity    Int
   reason      String?
   partId      String
+  saleId      String?         // Link to sale if this is a sale transaction
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
 
   part Part @relation(fields: [partId], references: [id], onDelete: Cascade)
+  sale Sale? @relation(fields: [saleId], references: [id], onDelete: SetNull)
 }
 
 model Shortcut {

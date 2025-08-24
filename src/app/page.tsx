@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import { DashboardStats } from '@/components/dashboard/stats'
 import { LowStockAlert } from '@/components/dashboard/low-stock-alert'
-import { RecentTransactions } from '@/components/dashboard/recent-transactions'
+import { RecentSales } from '@/components/dashboard/recent-sales'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function Dashboard() {
@@ -18,14 +18,14 @@ export default function Dashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4">
           <CardHeader>
-            <CardTitle>Recent Transactions</CardTitle>
+            <CardTitle>Recent Sales</CardTitle>
             <CardDescription>
-              Latest inventory movements
+              Latest customer purchases
             </CardDescription>
           </CardHeader>
           <CardContent className="pl-2">
-            <Suspense fallback={<div>Loading transactions...</div>}>
-              <RecentTransactions />
+            <Suspense fallback={<div>Loading sales...</div>}>
+              <RecentSales />
             </Suspense>
           </CardContent>
         </Card>
