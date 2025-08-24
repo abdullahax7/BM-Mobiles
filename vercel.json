@@ -1,0 +1,9 @@
+{
+  "buildCommand": "prisma generate --schema=./prisma/schema.production.prisma && next build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "installCommand": "npm install --force",
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
