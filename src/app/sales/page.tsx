@@ -44,7 +44,9 @@ export default function SalesPage({ searchParams }: PageProps) {
         </div>
       </div>
 
-      <SalesFilters />
+      <Suspense fallback={<div>Loading filters...</div>}>
+        <SalesFilters />
+      </Suspense>
       
       <Suspense fallback={<div>Loading sales...</div>}>
         <SalesTable searchParams={searchParams} />
