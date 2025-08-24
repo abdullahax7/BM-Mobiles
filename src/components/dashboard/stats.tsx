@@ -10,7 +10,7 @@ export async function DashboardStats() {
     recentTransactions
   ] = await Promise.all([
     db.part.count(),
-    db.$queryRaw<Array<{ count: bigint | number }>>`SELECT COUNT(*) as count FROM Part WHERE stock <= lowStockThreshold`.then((result) => Number(result[0]?.count ?? 0)),
+    db.$queryRaw<Array<{ count: bigint | number }>>`SELECT COUNT(*) as count FROM "Part" WHERE stock <= "lowStockThreshold"`.then((result) => Number(result[0]?.count ?? 0)),
     db.part.aggregate({
       _sum: {
         sellingPrice: true

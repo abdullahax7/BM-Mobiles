@@ -122,14 +122,14 @@ export async function GET(request: NextRequest) {
     // Get daily sales for chart
     const dailySales = await db.$queryRaw`
       SELECT 
-        DATE(createdAt) as date,
+        DATE("createdAt") as date,
         COUNT(*) as count,
-        SUM(finalAmount) as revenue
-      FROM Sale
-      WHERE createdAt >= ${startDate}
-        AND createdAt <= ${endDate}
+        SUM("finalAmount") as revenue
+      FROM "Sale"
+      WHERE "createdAt" >= ${startDate}
+        AND "createdAt" <= ${endDate}
         AND status = 'COMPLETED'
-      GROUP BY DATE(createdAt)
+      GROUP BY DATE("createdAt")
       ORDER BY date
     ` as { date: string; count: bigint; revenue: number }[]
 
