@@ -1,5 +1,5 @@
 {
-  "buildCommand": "prisma generate --schema=./prisma/schema.production.prisma && next build",
+  "buildCommand": "prisma generate --schema=./prisma/schema.production.prisma && prisma db push --schema=./prisma/schema.production.prisma --skip-generate && next build",
   "outputDirectory": ".next",
   "framework": "nextjs",
   "installCommand": "npm install --force",
