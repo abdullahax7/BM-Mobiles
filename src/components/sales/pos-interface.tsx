@@ -69,9 +69,20 @@ export function POSInterface() {
 
   // Add item to cart
   const addToCart = (part: Part) => {
+    // Check if part has zero stock
+    if (part.stock <= 0) {
+      alert(`Cannot add "${part.name}" - Out of stock!`)
+      return
+    }
+
     const existingItem = cart.find(item => item.part.id === part.id)
     
     if (existingItem) {
+      // Check if adding one more would exceed stock
+      if (existingItem.quantity + 1 > part.stock) {
+        alert(`Cannot add more "${part.name}" - Only ${part.stock} units available in stock`)
+        return
+      }
       updateQuantity(part.id, existingItem.quantity + 1)
     } else {
       setCart([...cart, {
@@ -129,6 +140,14 @@ export function POSInterface() {
     if (finalAmount < 0) {
       alert('Discount cannot be greater than total amount')
       return
+    }
+
+    // Final stock validation before processing
+    for (const item of cart) {
+      if (item.quantity > item.part.stock) {
+        alert(`Insufficient stock for "${item.part.name}". Available: ${item.part.stock}, In cart: ${item.quantity}`)
+        return
+      }
     }
 
     setProcessing(true)
@@ -214,16 +233,34 @@ export function POSInterface() {
                 {searchResults.map(part => (
                   <div
                     key={part.id}
-                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent cursor-pointer"
+                    className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer ${
+                      part.stock <= 0 
+                        ? 'bg-red-50 border-red-200 opacity-75' 
+                        : part.stock <= 5 
+                        ? 'bg-yellow-50 border-yellow-200 hover:bg-yellow-100' 
+                        : 'hover:bg-accent'
+                    }`}
                     onClick={() => addToCart(part)}
                   >
                     <div>
-                      <div className="font-medium">{part.name}</div>
+                      <div className="font-medium">
+                        {part.name}
+                        {part.stock <= 0 && (
+                          <Badge variant="destructive" className="ml-2">Out of Stock</Badge>
+                        )}
+                        {part.stock > 0 && part.stock <= 5 && (
+                          <Badge variant="outline" className="ml-2 border-yellow-500 text-yellow-700">Low Stock</Badge>
+                        )}
+                      </div>
                       <div className="text-sm text-muted-foreground">
                         SKU: {part.sku} | Stock: {part.stock} | Price: PKR {part.sellingPrice.toFixed(2)}
                       </div>
                     </div>
-                    <Button size="sm" variant="ghost">
+                    <Button 
+                      size="sm" 
+                      variant="ghost"
+                      disabled={part.stock <= 0}
+                    >
                       <Plus className="h-4 w-4" />
                     </Button>
                   </div>

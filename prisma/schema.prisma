@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Platform {
@@ -117,7 +118,7 @@ model Sale {
   finalAmount     Float
   paymentMethod   PaymentMethod
   status          SaleStatus    @default(COMPLETED)
-  notes           String?
+  notes           String?       @db.Text
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
@@ -146,7 +147,7 @@ model Transaction {
   id          String          @id @default(cuid())
   type        TransactionType
   quantity    Int
-  reason      String?
+  reason      String?         @db.Text
   partId      String
   saleId      String?         // Link to sale if this is a sale transaction
   createdAt   DateTime        @default(now())
@@ -159,8 +160,8 @@ model Transaction {
 model Shortcut {
   id          String   @id @default(cuid())
   name        String   @unique
-  description String?
-  filters     String   // JSON string of filter object
+  description String?  @db.Text
+  filters     String   @db.Text // JSON string of filter object
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

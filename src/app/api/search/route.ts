@@ -76,9 +76,9 @@ async function searchWithDatabase(
   
   if (query.trim()) {
     where.OR = [
-      { name: { contains: query } },
-      { description: { contains: query } },
-      { sku: { contains: query } }
+      { name: { contains: query, mode: 'insensitive' } },
+      { description: { contains: query, mode: 'insensitive' } },
+      { sku: { contains: query, mode: 'insensitive' } }
     ]
   }
 
