@@ -16,6 +16,7 @@
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f",
     "es:reindex": "tsx src/scripts/reindex.ts",
+    "pin:init": "tsx src/scripts/init-pin.ts",
     "setup": "npm install && npm run db:generate && npm run db:push && npm run db:seed"
   },
   "dependencies": {

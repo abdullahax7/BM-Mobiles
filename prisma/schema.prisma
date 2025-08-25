@@ -14,8 +14,7 @@ model Platform {
   slug      String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  brands Brand[]
+  brands    Brand[]
 }
 
 model Brand {
@@ -25,9 +24,8 @@ model Brand {
   platformId String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-
-  platform Platform @relation(fields: [platformId], references: [id], onDelete: Cascade)
-  families Family[]
+  platform   Platform @relation(fields: [platformId], references: [id], onDelete: Cascade)
+  families   Family[]
 
   @@unique([platformId, slug])
 }
@@ -39,52 +37,115 @@ model Family {
   brandId   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  brand  Brand   @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  models Model[]
+  brand     Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  models    Model[]
 
   @@unique([brandId, slug])
 }
 
 model Model {
-  id        String   @id @default(cuid())
+  id        String      @id @default(cuid())
   name      String
   slug      String
   familyId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
-  parts  PartModel[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  family    Family      @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  parts     PartModel[]
 
   @@unique([familyId, slug])
 }
 
 model Part {
-  id                String   @id @default(cuid())
+  id                String        @id @default(cuid())
   name              String
   description       String?
-  sku               String   @unique
+  sku               String        @unique
   realCost          Float
   sellingPrice      Float
-  stock             Int      @default(0)
-  lowStockThreshold Int      @default(10)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-
-  models       PartModel[]
-  transactions Transaction[]
-  saleItems    SaleItem[]
+  stock             Int           @default(0)
+  lowStockThreshold Int           @default(10)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  models            PartModel[]
+  saleItems         SaleItem[]
+  transactions      Transaction[]
 }
 
 model PartModel {
   partId  String
   modelId String
-
-  part  Part  @relation(fields: [partId], references: [id], onDelete: Cascade)
-  model Model @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  model   Model  @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  part    Part   @relation(fields: [partId], references: [id], onDelete: Cascade)
 
   @@id([partId, modelId])
+}
+
+model Sale {
+  id            String        @id @default(cuid())
+  customerName  String?
+  customerPhone String?
+  customerEmail String?
+  totalAmount   Float
+  discount      Float         @default(0)
+  finalAmount   Float
+  paymentMethod PaymentMethod
+  status        SaleStatus    @default(COMPLETED)
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  items         SaleItem[]
+  transactions  Transaction[]
+}
+
+model SaleItem {
+  id         String   @id @default(cuid())
+  saleId     String
+  partId     String
+  quantity   Int
+  unitPrice  Float
+  totalPrice Float
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  part       Part     @relation(fields: [partId], references: [id])
+  sale       Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+
+  @@index([saleId])
+  @@index([partId])
+}
+
+model Transaction {
+  id        String          @id @default(cuid())
+  type      TransactionType
+  quantity  Int
+  reason    String?
+  partId    String
+  saleId    String?
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  part      Part            @relation(fields: [partId], references: [id], onDelete: Cascade)
+  sale      Sale?           @relation(fields: [saleId], references: [id])
+}
+
+model Shortcut {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  filters     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AuthPin {
+  id          String    @id @default(cuid())
+  pin         String
+  salt        String
+  isActive    Boolean   @default(true)
+  lastUsed    DateTime?
+  attempts    Int       @default(0)
+  lockedUntil DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 enum TransactionType {
@@ -106,62 +167,4 @@ enum SaleStatus {
   CANCELLED
   REFUNDED
   PENDING
-}
-
-model Sale {
-  id              String        @id @default(cuid())
-  customerName    String?
-  customerPhone   String?
-  customerEmail   String?
-  totalAmount     Float
-  discount        Float         @default(0)
-  finalAmount     Float
-  paymentMethod   PaymentMethod
-  status          SaleStatus    @default(COMPLETED)
-  notes           String?       @db.Text
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-
-  items        SaleItem[]
-  transactions Transaction[]
-}
-
-model SaleItem {
-  id         String   @id @default(cuid())
-  saleId     String
-  partId     String
-  quantity   Int
-  unitPrice  Float
-  totalPrice Float
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  sale Sale @relation(fields: [saleId], references: [id], onDelete: Cascade)
-  part Part @relation(fields: [partId], references: [id])
-
-  @@index([saleId])
-  @@index([partId])
-}
-
-model Transaction {
-  id          String          @id @default(cuid())
-  type        TransactionType
-  quantity    Int
-  reason      String?         @db.Text
-  partId      String
-  saleId      String?         // Link to sale if this is a sale transaction
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-
-  part Part @relation(fields: [partId], references: [id], onDelete: Cascade)
-  sale Sale? @relation(fields: [saleId], references: [id], onDelete: SetNull)
-}
-
-model Shortcut {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  description String?  @db.Text
-  filters     String   @db.Text // JSON string of filter object
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
 }

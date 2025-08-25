@@ -1,6 +1,8 @@
 import { Suspense } from 'react'
 import { PartsTable } from '@/components/parts/parts-table'
 import { PartsFilters } from '@/components/parts/parts-filters'
+import { PartsTableShimmer } from '@/components/parts/parts-table-shimmer'
+import { PartsFiltersShimmer } from '@/components/parts/parts-filters-shimmer'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
@@ -38,11 +40,11 @@ export default function PartsPage({ searchParams }: PageProps) {
       </div>
 
       <div className="space-y-4">
-        <Suspense fallback={<div>Loading filters...</div>}>
+        <Suspense fallback={<PartsFiltersShimmer />}>
           <PartsFilters />
         </Suspense>
         
-        <Suspense fallback={<div>Loading parts...</div>}>
+        <Suspense fallback={<PartsTableShimmer />}>
           <PartsTable searchParams={searchParams} />
         </Suspense>
       </div>

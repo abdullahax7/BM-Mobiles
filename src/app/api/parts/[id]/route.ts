@@ -194,7 +194,7 @@ export async function DELETE(
       )
     }
 
-    // Check if part has been sold
+    // Check if part has been sold or has transaction history
     if (existingPart._count.saleItems > 0) {
       return NextResponse.json(
         { 
@@ -204,6 +204,7 @@ export async function DELETE(
         { status: 400 }
       )
     }
+
 
     // Delete the part (relationships will be deleted due to cascade)
     await db.part.delete({

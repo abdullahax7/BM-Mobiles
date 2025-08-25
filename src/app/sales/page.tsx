@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { SalesTable } from '@/components/sales/sales-table'
 import { SalesFilters } from '@/components/sales/sales-filters'
+import { SalesTableShimmer, SalesFiltersShimmer } from '@/components/sales/sales-shimmer'
 import { Button } from '@/components/ui/button'
 import { Plus, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
@@ -44,11 +45,11 @@ export default function SalesPage({ searchParams }: PageProps) {
         </div>
       </div>
 
-      <Suspense fallback={<div>Loading filters...</div>}>
+      <Suspense fallback={<SalesFiltersShimmer />}>
         <SalesFilters />
       </Suspense>
       
-      <Suspense fallback={<div>Loading sales...</div>}>
+      <Suspense fallback={<SalesTableShimmer />}>
         <SalesTable searchParams={searchParams} />
       </Suspense>
     </div>

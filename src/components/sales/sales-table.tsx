@@ -42,19 +42,19 @@ export async function SalesTable({ searchParams }: SalesTableProps) {
   if (resolvedSearchParams.q) {
     const q = resolvedSearchParams.q
     where.OR = [
-      { customerName: { contains: q } },
-      { customerPhone: { contains: q } },
-      { customerEmail: { contains: q } },
-      { notes: { contains: q } },
-      { id: { contains: q } },
+      { customerName: { contains: q, mode: 'insensitive' } },
+      { customerPhone: { contains: q, mode: 'insensitive' } },
+      { customerEmail: { contains: q, mode: 'insensitive' } },
+      { notes: { contains: q, mode: 'insensitive' } },
+      { id: { contains: q, mode: 'insensitive' } },
       { 
         items: {
           some: {
             part: {
               OR: [
-                { name: { contains: q } },
-                { sku: { contains: q } },
-                { description: { contains: q } }
+                { name: { contains: q, mode: 'insensitive' } },
+                { sku: { contains: q, mode: 'insensitive' } },
+                { description: { contains: q, mode: 'insensitive' } }
               ]
             }
           }

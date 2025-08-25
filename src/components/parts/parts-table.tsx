@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Edit } from 'lucide-react'
 import Link from 'next/link'
 import { DeletePartButton } from '@/components/parts/delete-part-button'
+import { ExpandableModels } from '@/components/parts/expandable-models'
 
 interface PartsTableProps {
   searchParams: {
@@ -38,9 +39,9 @@ export async function PartsTable({ searchParams }: PartsTableProps) {
   
   if (resolvedSearchParams.q) {
     where.OR = [
-      { name: { contains: resolvedSearchParams.q } },
-      { description: { contains: resolvedSearchParams.q } },
-      { sku: { contains: resolvedSearchParams.q } }
+      { name: { contains: resolvedSearchParams.q, mode: 'insensitive' } },
+      { description: { contains: resolvedSearchParams.q, mode: 'insensitive' } },
+      { sku: { contains: resolvedSearchParams.q, mode: 'insensitive' } }
     ]
   }
 
@@ -172,18 +173,7 @@ export async function PartsTable({ searchParams }: PartsTableProps) {
                     <TableCell>PKR {part.realCost.toFixed(2)}</TableCell>
                     <TableCell>PKR {part.sellingPrice.toFixed(2)}</TableCell>
                     <TableCell>
-                      <div className="flex flex-wrap gap-1">
-                        {part.models.slice(0, 3).map((partModel) => (
-                          <Badge key={partModel.modelId} variant="secondary" className="text-xs">
-                            {partModel.model.name}
-                          </Badge>
-                        ))}
-                        {part.models.length > 3 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{part.models.length - 3} more
-                          </Badge>
-                        )}
-                      </div>
+                      <ExpandableModels models={part.models} />
                     </TableCell>
                     <TableCell>
                       <Badge

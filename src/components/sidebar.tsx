@@ -9,6 +9,7 @@ import {
   Layers,
   BarChart3,
   ShoppingCart,
+  Settings,
   ExternalLink
 } from 'lucide-react'
 
@@ -37,6 +38,11 @@ const navigation = [
     name: 'Analytics',
     href: '/analytics',
     icon: BarChart3,
+  },
+  {
+    name: 'Settings',
+    href: '/settings',
+    icon: Settings,
   },
 ]
 

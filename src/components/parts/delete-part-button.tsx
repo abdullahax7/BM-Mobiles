@@ -23,13 +23,19 @@ export function DeletePartButton({ id, onDeleted }: DeletePartButtonProps) {
       const res = await fetch(`/api/parts/${id}`, { method: "DELETE" })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
-        throw new Error(body.error || `Failed to delete part ${id}`)
+        const errorMessage = body.details ? `${body.error}: ${body.details}` : (body.error || `Failed to delete part ${id}`)
+        throw new Error(errorMessage)
       }
       onDeleted?.()
       router.refresh()
     } catch (err) {
-      console.error(err)
-      alert((err as Error).message)
+      console.error('Delete part error:', err)
+      const message = (err as Error).message
+      if (message.includes('sale(s)') || message.includes('transaction')) {
+        alert(`Cannot delete part: ${message}\n\nParts with sales or transaction history cannot be deleted to maintain data integrity.`)
+      } else {
+        alert(`Failed to delete part: ${message}`)
+      }
     } finally {
       setLoading(false)
     }

@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import { DashboardStats } from '@/components/dashboard/stats'
 import { LowStockAlert } from '@/components/dashboard/low-stock-alert'
 import { RecentSales } from '@/components/dashboard/recent-sales'
+import { DashboardStatsShimmer, RecentSalesShimmer, LowStockAlertShimmer } from '@/components/dashboard/dashboard-shimmer'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function Dashboard() {
@@ -11,7 +12,7 @@ export default function Dashboard() {
         <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
       </div>
       
-      <Suspense fallback={<div>Loading stats...</div>}>
+      <Suspense fallback={<DashboardStatsShimmer />}>
         <DashboardStats />
       </Suspense>
       
@@ -24,7 +25,7 @@ export default function Dashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent className="pl-2">
-            <Suspense fallback={<div>Loading sales...</div>}>
+            <Suspense fallback={<RecentSalesShimmer />}>
               <RecentSales />
             </Suspense>
           </CardContent>
@@ -38,7 +39,7 @@ export default function Dashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Suspense fallback={<div>Loading alerts...</div>}>
+            <Suspense fallback={<LowStockAlertShimmer />}>
               <LowStockAlert />
             </Suspense>
           </CardContent>
