@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { searchParts, isElasticsearchHealthy, SearchFilters } from '@/lib/elasticsearch'
 import { db } from '@/lib/db'
+import { Prisma } from '@prisma/client'
 
 export async function GET(request: NextRequest) {
   try {
@@ -71,8 +72,8 @@ async function searchWithDatabase(
 ) {
   const startTime = Date.now()
   
-  // Build where clause for database search
-  const where: Record<string, unknown> = {}
+  // Build where clause for database search with proper Prisma typing
+  const where: Prisma.PartWhereInput = {}
   
   if (query.trim()) {
     where.OR = [

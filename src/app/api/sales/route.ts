@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
+import { Prisma } from '@prisma/client'
 
 const CreateSaleSchema = z.object({
   customerName: z.string().optional(),
@@ -138,8 +139,8 @@ export async function GET(request: NextRequest) {
     
     const offset = (page - 1) * limit
     
-    // Build where clause
-    const where: Record<string, unknown> = {}
+    // Build where clause with proper Prisma typing
+    const where: Prisma.SaleWhereInput = {}
     
     // Text search across customer fields, sale ID, and parts
     if (q) {

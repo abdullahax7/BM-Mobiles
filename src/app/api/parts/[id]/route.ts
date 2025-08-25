@@ -175,9 +175,16 @@ export async function DELETE(
   const { params } = context
   const resolvedParams = await params
   try {
-    // Check if part exists
+    // Check if part exists with sales relationships
     const existingPart = await db.part.findUnique({
-      where: { id: resolvedParams.id }
+      where: { id: resolvedParams.id },
+      include: {
+        _count: {
+          select: {
+            saleItems: true
+          }
+        }
+      }
     })
 
     if (!existingPart) {
@@ -187,14 +194,37 @@ export async function DELETE(
       )
     }
 
+    // Check if part has been sold
+    if (existingPart._count.saleItems > 0) {
+      return NextResponse.json(
+        { 
+          error: 'Cannot delete part', 
+          details: `This part has been used in ${existingPart._count.saleItems} sale(s). Parts with sales history cannot be deleted to maintain data integrity.` 
+        },
+        { status: 400 }
+      )
+    }
+
     // Delete the part (relationships will be deleted due to cascade)
     await db.part.delete({
       where: { id: resolvedParams.id }
     })
 
     return NextResponse.json({ message: 'Part deleted successfully' })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error deleting part:', error)
+    
+    // Handle Prisma foreign key constraint error
+    if (error?.code === 'P2003') {
+      return NextResponse.json(
+        { 
+          error: 'Cannot delete part',
+          details: 'This part is being used in sales records and cannot be deleted.'
+        },
+        { status: 400 }
+      )
+    }
+    
     return NextResponse.json(
       { error: 'Failed to delete part' },
       { status: 500 }

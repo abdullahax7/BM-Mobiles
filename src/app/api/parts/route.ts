@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
+import { Prisma } from '@prisma/client'
 
 const CreatePartSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -27,8 +28,8 @@ export async function GET(request: NextRequest) {
     
     const offset = (page - 1) * limit
     
-    // Build where clause
-    const where: Record<string, unknown> = {}
+    // Build where clause with proper Prisma typing
+    const where: Prisma.PartWhereInput = {}
     
     if (query) {
       where.OR = [
